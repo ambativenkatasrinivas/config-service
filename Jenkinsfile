@@ -7,9 +7,9 @@ node {
          stage('Clone Repo') {
             // for display purposes
             // Get some code from a GitHub repository
-            git url: 'https://gitlab.com/gpranataAsyst/springboot-demodeploy.git',
-                credentialsId: 'springdeploy-user',
-                branch: 'main'
+            git url: 'https://github.com/ambativenkatasrinivas/config-service.git',
+                credentialsId: 'My-Github-credentials',
+                branch: 'master'
          }
           stage('Build docker') {
                  dockerImage = docker.build("springboot-deploy:${env.BUILD_NUMBER}")
@@ -18,7 +18,7 @@ node {
           stage('Deploy docker'){
                   echo "Docker Image Tag Name: ${dockerImageTag}"
                   sh "docker stop springboot-deploy || true && docker rm springboot-deploy || true"
-                  sh "docker run --name springboot-deploy -d -p 8081:8081 springboot-deploy:${env.BUILD_NUMBER}"
+                  sh "docker run --name springboot-deploy -d -p 8090:8090 springboot-deploy:${env.BUILD_NUMBER}"
           }
     }catch(e){
 //         currentBuild.result = "FAILED"
@@ -44,12 +44,4 @@ def notifyBuild(String buildStatus = 'STARTED'){
     <p>Job: ${env.JOB_NAME} - Deployment Sequence: [${env.BUILD_NUMBER}] - Time: ${now}</p>
     <p>Check console output at "<a href="${env.BUILD_URL}">${env.JOB_NAME}</a>"</p>"""
 
-
-  // Email notification
-    emailext (
-         to: "admin@gmail.com",
-         subject: subject_email,
-         body: details,
-         recipientProviders: [[$class: 'DevelopersRecipientProvider']]
-       )
 }
